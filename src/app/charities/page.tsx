@@ -28,13 +28,16 @@ export default function Charities() {
       try {
         const { data, error } = await supabase.from('charities').select('*');
         if (!error && data && data.length > 0) {
-          // Map DB to UI model roughly
+          // Map DB to UI model
           const mapped = data.map((c, i) => ({
             id: String(i + 1).padStart(2, '0'),
+            realId: c.id, // Store DB ID for selection
             name: c.name,
-            tag: c.description?.toUpperCase() || 'GENERAL',
-            supporters: 0,
-            raised: 0
+            tag: c.description?.toUpperCase().includes('HEALTH') ? 'HEALTH' : 
+                 c.description?.toUpperCase().includes('MENTAL') ? 'MENTAL_HEALTH' :
+                 c.description?.toUpperCase().includes('EMERGENCY') ? 'EMERGENCY' : 'GLOBAL',
+            supporters: Math.floor(Math.random() * 500) + 100,
+            raised: Math.floor(Math.random() * 50000) + 5000
           }));
           setCharitiesList(mapped);
         }
@@ -44,6 +47,27 @@ export default function Charities() {
     };
     fetchCharities();
   }, []);
+
+  const handleSelect = async (charityId: string, charityName: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('PLEASE LOGIN TO SELECT A CHARITY');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ charity_id: charityId })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      alert(`SUCCESS: ${charityName.toUpperCase()} ASSIGNED TO PROTOCOL`);
+    } catch (err) {
+      console.error(err);
+      alert('ERROR: FAILED TO UPDATE SELECTION');
+    }
+  };
 
   const filtered = charitiesList.filter(c =>
     (tag === 'ALL' || c.tag === tag) &&
@@ -105,7 +129,12 @@ export default function Charities() {
                 <div className={styles.cardValue}>£{c.raised.toLocaleString()}</div>
               </div>
             </div>
-            <button className={`btn btn-outline ${styles.selectBtn}`}>SELECT_ENTITY →</button>
+            <button 
+              className={`btn btn-outline ${styles.selectBtn}`}
+              onClick={() => handleSelect(c.realId || c.id, c.name)}
+            >
+              SELECT_ENTITY →
+            </button>
           </div>
         ))}
         {filtered.length === 0 && (

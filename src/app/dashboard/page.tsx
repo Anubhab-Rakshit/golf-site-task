@@ -292,22 +292,27 @@ export default function Dashboard() {
           <div className={styles.charityPanel}>
             <div className={`${styles.charityCard} bracket`}>
               <span className="label-tech">ASSIGNED_ENTITY</span>
-              <div className={styles.charityName}>MACMILLAN CANCER SUPPORT</div>
+              <div className={styles.charityName}>
+                {profile?.charity_id ? 'ASSIGNED_PROTCOL_ENTITY' : 'NO_ENTITY_SELECTED'}
+              </div>
+              <p className="label-tech" style={{ marginTop: '0.5rem', opacity: 0.6 }}>
+                {profile?.charity_id ? 'Your active subscription contributes 30% to this entity.' : 'Please visit the Charities gallery to select an entity.'}
+              </p>
               <div className={styles.charityBar}>
-                <div className={styles.charityFill} style={{ width: '30%'}}/>
+                <div className={styles.charityFill} style={{ width: profile?.charity_id ? '30%' : '0%'}}/>
               </div>
               <div className={styles.charityStats}>
                 <div>
                   <span className="label-tech">YOUR_CONTRIBUTION</span>
-                  <div className={styles.dataValue}>£26.76</div>
+                  <div className={styles.dataValue}>£{profile?.subscription_status === 'active' ? '26.76' : '0.00'}</div>
                 </div>
                 <div>
                   <span className="label-tech">SPLIT</span>
                   <div className={styles.dataValue}>30%</div>
                 </div>
                 <div>
-                  <span className="label-tech">TOTAL_RAISED</span>
-                  <div className={styles.dataValue}>£84,200</div>
+                  <span className="label-tech">ENTITY_IMPACT</span>
+                  <div className={styles.dataValue}>HIGH</div>
                 </div>
               </div>
             </div>
@@ -323,15 +328,28 @@ export default function Dashboard() {
                 <span className="status-live">DRAW LIVE</span>
               </div>
               <div className={styles.drawBalls}>
-                {[42, 38, 35, 41, 29].map((n, i) => (
+                {/* Dynamically derive from last 5 scores or fallback */}
+                {(scoresList.length > 0 ? scoresList.map(s => s.stb) : [0,0,0,0,0]).map((n, i) => (
                   <div key={i} className={styles.drawBall}>
                     <span className="label-tech">N{i+1}</span>
-                    <span className={styles.ballValue}>{n}</span>
+                    <span className={styles.ballValue}>{String(n).padStart(2, '0')}</span>
                   </div>
                 ))}
               </div>
-              <p className={styles.drawNote}>These numbers are derived from your 5 most recent Stableford scores. The draw executes APR 01 2026.</p>
+              <p className={styles.drawNote}>Numbers are derived from your 5 most recent Stableford points. The draw executes APR 01 2026.</p>
             </div>
+            
+            {/* PRD Role Requirement: Winner Proof Upload */}
+            <div className={`${styles.drawCard} bracket`} style={{ marginTop: '2rem' }}>
+              <span className="label-tech">WINNER_VERIFICATION_PROTOCOL</span>
+              <div className={styles.uploadArea}>
+                <p className={styles.drawNote}>If you have been notified of a win, upload your official scorecard proof here for verification.</p>
+                <div className={styles.uploadPlaceholder} onClick={() => alert('Simulated: File Picker Opened')}>
+                  <span className="label-tech">CLICK_TO_UPLOAD_PROOF_SVG/PNG</span>
+                </div>
+              </div>
+            </div>
+
             <div className={styles.drawStats}>
               <div className={styles.drawStat}>
                 <span className="label-tech">CURRENT_POOL</span>

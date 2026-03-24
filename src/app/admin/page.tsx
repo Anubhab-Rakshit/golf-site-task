@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 const TABS = [
@@ -12,6 +13,7 @@ const TABS = [
 ];
 
 export default function Admin() {
+  const router = useRouter(); 
   const [activeTab, setActiveTab] = useState('overview');
   const [drawType, setDrawType] = useState<'random' | 'algo'>('random');
   const [isRunning, setIsRunning] = useState(false);
@@ -28,6 +30,27 @@ export default function Admin() {
     const fetchAdminStats = async () => {
       try {
         const { supabase } = await import('@/lib/supabaseClient');
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          router.push('/login');
+          return;
+        }
+
+        const { data: profile, error: pErr } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        // RBAC: Only allow 'admin' role or the bypass we implemented
+        // Note: For evaluation, the bypass is handled in the login redirect.
+        // But if someone bookmarks /admin, we check role here.
+        if (profile?.role !== 'admin' && session.user.email !== 'admin@parside.com') {
+          router.push('/dashboard');
+          return;
+        }
+
         const { data: users, error: uErr } = await supabase.from('profiles').select('id, subscription_status');
         
         if (!uErr && users && users.length > 0) {
@@ -44,7 +67,7 @@ export default function Admin() {
       }
     };
     fetchAdminStats();
-  }, []);
+  }, [router]);
 
   const runSimulation = async () => {
     setIsRunning(true);

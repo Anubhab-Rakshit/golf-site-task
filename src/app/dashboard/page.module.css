@@ -394,9 +394,31 @@
 }
 
 .drawNote {
-  font-size: 0.85rem;
-  color: var(--t-secondary);
-  line-height: 1.6;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-top: 1rem;
+  line-height: 1.4;
+}
+
+.uploadArea {
+  margin-top: 1rem;
+}
+
+.uploadPlaceholder {
+  margin-top: 1.5rem;
+  border: 1px dashed rgba(255,255,255,0.1);
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.uploadPlaceholder:hover {
+  border-color: var(--accent);
+  background: rgba(0, 255, 136, 0.03);
 }
 
 .drawStats {
