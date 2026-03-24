@@ -1,4 +1,4 @@
-# ParSide 🏌️‍♂️💎
+# ParSide 
 
 ![ParSide Logo](public/logo.png)
 
