@@ -208,7 +208,7 @@ export default function Dashboard() {
               </div>
               <div className={styles.chartBars}>
                 {scoresList.map((s: any, i: number) => {
-                  const pct = Math.round((s.stb / 54) * 100);
+                  const pct = Math.round((s.stb / 45) * 100);
                   const color = s.stb >= 40 ? 'var(--accent)' : s.stb >= 35 ? '#60a5fa' : 'var(--t-muted)';
                   return (
                     <div key={i} className={styles.chartBar}>
@@ -235,8 +235,8 @@ export default function Dashboard() {
                 <div className={styles.formField}>
                   <label className="label-tech">STABLEFORD_SCORE</label>
                   <input
-                    type="number" min="0" max="54"
-                    placeholder="00 — 54 PTS"
+                    type="number" min="1" max="45"
+                    placeholder="01 — 45 PTS"
                     value={score}
                     onChange={e => setScore(e.target.value)}
                     className={`${styles.input}`}
