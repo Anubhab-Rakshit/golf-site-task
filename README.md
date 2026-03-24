@@ -4,7 +4,7 @@
 
 > **TECHNICAL LUXURY GOLF CHARITY SUBSCRIPTION PLATFORM**
 >
-> An Awwwards-inspired "Technical Luxury" web application designed for high-performance golf tracking, charitable giving, and monthly prize draws. Built with extreme precision, brutalist geometry, and real-time backend synchronization.
+> A web application designed for high-performance golf tracking, charitable giving, and monthly prize draws. Built with extreme precision, brutalist geometry, and real-time backend synchronization.
 
 ---
 
@@ -85,4 +85,4 @@ npm run dev
 
 ---
 
-*Built by Digital Heroes Selection Intern — 2026*
+*Built by Anubhab Rakshit— 2026*
