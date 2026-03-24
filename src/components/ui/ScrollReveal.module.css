@@ -1,0 +1,9 @@
+.reveal {
+  will-change: transform, opacity;
+}
+
+.staggerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

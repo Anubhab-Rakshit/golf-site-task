@@ -1,0 +1,7 @@
+.transitionOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--c-primary);
+  z-index: 9998;
+  pointer-events: none;
+}

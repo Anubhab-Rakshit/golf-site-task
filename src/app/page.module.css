@@ -1,0 +1,455 @@
+.page {
+  padding-top: 96px; /* navbar + ticker offset */
+}
+
+/* ── HERO ───────────────────────────────────────────────── */
+.hero {
+  min-height: calc(100vh - 96px);
+  display: flex;
+  align-items: center;
+  padding: 5rem 2rem;
+  border-bottom: 1px solid var(--b-01);
+  position: relative;
+}
+
+.heroInner {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  gap: 5rem;
+  align-items: center;
+  width: 100%;
+}
+
+.heroLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: clamp(7rem, 14vw, 14rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.85;
+  color: var(--t-primary);
+  user-select: none;
+}
+
+.heroAccent {
+  color: var(--accent);
+  display: block;
+}
+
+.heroSub {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--t-secondary);
+  max-width: 520px;
+}
+
+.heroCtas {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── Terminal Card ──────────────────────────────────────── */
+.heroRight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.terminalCard {
+  width: 100%;
+  background: var(--s-02);
+  border: 1px solid var(--b-02);
+  border-top: 1px solid var(--accent);
+  padding: 2rem;
+  position: relative;
+}
+
+/* Corner bracket top-right */
+.terminalCard::after {
+  content: '';
+  position: absolute;
+  top: -1px; right: -1px;
+  width: 20px; height: 20px;
+  border-top: 1px solid var(--accent);
+  border-right: 1px solid var(--accent);
+}
+
+.terminalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--b-01);
+}
+
+.terminalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.terminalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.terminalValue {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--t-primary);
+}
+
+.terminalDivider {
+  height: 1px;
+  background: var(--b-01);
+  margin: 1rem 0;
+}
+
+.pendingBalls {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.pendingBall {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--b-02);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--t-muted);
+  background: var(--s-01);
+}
+
+/* ── TICKER ─────────────────────────────────────────────── */
+.tickerBelt {
+  background: var(--s-01);
+  border-top: 1px solid var(--b-01);
+  border-bottom: 1px solid var(--b-01);
+  overflow: hidden;
+  padding: 0.75rem 0;
+}
+
+.tickerTrack {
+  display: flex;
+  gap: 3rem;
+  animation: ticker 40s linear infinite;
+  width: max-content;
+}
+
+.tickerItem {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--t-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+.tickerDot {
+  color: var(--accent);
+  font-size: 0.5rem;
+}
+
+/* ── METRICS ─────────────────────────────────────────────── */
+.metrics {
+  border-bottom: 1px solid var(--b-01);
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+}
+
+.metricCard {
+  padding: 3rem 2.5rem;
+  border-right: 1px solid var(--b-01);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.metricCard:last-child { border-right: none; }
+
+.metricValue {
+  font-family: var(--font-mono);
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--t-primary);
+}
+
+/* ── SECTION MARKER ─────────────────────────────────────── */
+.sectionMarker {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 2rem;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.markerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--b-01);
+}
+
+/* ── MECHANICS ───────────────────────────────────────────── */
+.mechanicsInner {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 6rem;
+  align-items: flex-start;
+}
+
+.mechanicsTitle {
+  margin-bottom: 1.5rem;
+}
+
+.mechanicsDesc {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--t-secondary);
+}
+
+.stepsCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 2rem;
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--b-01);
+  position: relative;
+}
+
+.step:first-child { padding-top: 0; }
+.step:last-child { border-bottom: none; }
+
+.stepId {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stepTitle {
+  margin-bottom: 0.75rem;
+  color: var(--t-primary);
+}
+
+.stepBody {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--t-secondary);
+}
+
+/* ── PRIZES ──────────────────────────────────────────────── */
+.prizes {
+  border-top: 1px solid var(--b-01);
+  border-bottom: 1px solid var(--b-01);
+}
+
+.prizesHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 4rem;
+}
+
+.prizeTiers {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.prizeRow {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 3rem;
+  align-items: center;
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--b-01);
+  position: relative;
+}
+
+.prizeRow:last-child { border-bottom: none; }
+
+.prizeLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.prizeRight {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.prizeMatch {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--t-primary);
+}
+
+.prizeRight p {
+  font-size: 0.9rem;
+  color: var(--t-secondary);
+}
+
+.prizeBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--b-01);
+}
+
+.prizeBarFill {
+  height: 2px;
+  background: var(--accent);
+  opacity: 0.5;
+  margin-top: -1px;
+  transition: width 1s ease;
+}
+
+/* ── CHARITY ─────────────────────────────────────────────── */
+.charityHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 4rem;
+}
+
+.charityGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid var(--b-01);
+}
+
+.charityCard {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  border-right: 1px solid var(--b-01);
+  border-bottom: 1px solid var(--b-01);
+  transition: background var(--t-fast);
+}
+
+.charityCard:hover { background: var(--s-02); }
+.charityCard:nth-child(3n) { border-right: none; }
+.charityCard:nth-child(4), .charityCard:nth-child(5), .charityCard:nth-child(6) { border-bottom: none; }
+
+.charityIndex {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.charityName {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t-primary);
+}
+
+.charityViewAll {
+  margin-top: 2rem;
+}
+
+/* ── FINAL CTA ───────────────────────────────────────────── */
+.finalCta {
+  border-top: 1px solid var(--b-01);
+  padding: 10rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Radial glow */
+.finalCta::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ctaInner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.ctaTitle {
+  max-width: 700px;
+}
+
+.ctaActions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .metricsGrid { grid-template-columns: repeat(2, 1fr); }
+  .metricCard:nth-child(2) { border-right: none; }
+  .metricCard:nth-child(1), .metricCard:nth-child(2) { border-bottom: 1px solid var(--b-01); }
+  .heroInner { grid-template-columns: 1fr; }
+  .heroRight { display: none; }
+  .mechanicsInner { grid-template-columns: 1fr; gap: 3rem; }
+}
+
+@media (max-width: 768px) {
+  .metricsGrid { grid-template-columns: repeat(2, 1fr); }
+  .step { grid-template-columns: 1fr; gap: 0.75rem; }
+  .prizeRow { grid-template-columns: 120px 1fr; gap: 1.5rem; }
+  .charityGrid { grid-template-columns: 1fr 1fr; }
+  .charityCard:nth-child(2n) { border-right: none; }
+  .charityCard:nth-child(5), .charityCard:nth-child(6) { border-bottom: 1px solid var(--b-01); }
+}
+
+@media (max-width: 480px) {
+  .heroTitle { font-size: 5.5rem; }
+  .metricsGrid { grid-template-columns: 1fr; }
+  .metricCard { border-right: none; border-bottom: 1px solid var(--b-01); }
+  .charityGrid { grid-template-columns: 1fr; }
+  .charityCard { border-right: none; }
+  .charityCard:nth-child(n) { border-bottom: 1px solid var(--b-01); }
+}

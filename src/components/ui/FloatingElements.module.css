@@ -1,0 +1,60 @@
+.floating {
+  will-change: transform;
+}
+
+.morphingShape {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, rgba(196, 167, 125, 0.15) 0%, rgba(139, 115, 85, 0.1) 100%);
+  filter: blur(80px);
+}
+
+.rotatingShape {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border: 1px solid rgba(196, 167, 125, 0.08);
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+}
+
+.glowOrb {
+  position: absolute;
+  pointer-events: none;
+}
+
+.cursorRing {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10000;
+  mix-blend-mode: difference;
+}
+
+.cursorDot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.cursorRing::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.15s ease-out;
+}
+
+.cursorRing:hover::before {
+  width: 60px;
+  height: 60px;
+  border-color: rgba(255, 255, 255, 0.5);
+}
