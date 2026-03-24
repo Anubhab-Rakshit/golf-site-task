@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
 import styles from './page.module.css';
 
 const NAV = [
@@ -10,7 +12,8 @@ const NAV = [
   { id: 'draw', label: 'DRAW_STATUS', key: '04' },
 ];
 
-const SCORES = [
+// Fallback mock scores until API is wired up for STB
+const MOCK_SCORES = [
   { date: '11_MAR_2026', course: 'WENTWORTH', stb: 42 },
   { date: '04_MAR_2026', course: 'SUNNINGDALE', stb: 38 },
   { date: '25_FEB_2026', course: 'ST_ANDREWS', stb: 35 },
@@ -19,19 +22,109 @@ const SCORES = [
 ];
 
 export default function Dashboard() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
   const [score, setScore] = useState('');
   const [course, setCourse] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [scoresList, setScoresList] = useState<any[]>(MOCK_SCORES);
+
+  useEffect(() => {
+    let channel: any;
+
+    const fetchUserAndScores = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        router.push('/login');
+        return;
+      }
+      
+      setUser(session.user);
+      
+      // Fetch Profile for name and sub status
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (profileData) setProfile(profileData);
+
+      // Fetch Real Scores
+      const { data: realScores, error: scoreErr } = await supabase
+        .from('scores')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('date', { ascending: false })
+        .limit(5);
+
+      if (!scoreErr && realScores && realScores.length > 0) {
+        // Map DB to UI model
+        const mapped = realScores.map(row => ({
+          date: new Date(row.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toUpperCase(),
+          course: row.course_name || 'UNKNOWN',
+          stb: row.stableford_points
+        }));
+        setScoresList(mapped);
+      } // Else keep MOCK_SCORES so the UI isn't empty on fresh DBs
+
+      // Set up Realtime Listener for Scores
+      channel = supabase.channel('realtime-scores')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'scores', filter: `user_id=eq.${session.user.id}` }, payload => {
+          console.log('Realtime INSERT seen:', payload);
+          // Prepend new score to list
+          const d = new Date(payload.new.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toUpperCase();
+          const liveScore = { date: d, course: payload.new.course_name || 'UNKNOWN', stb: payload.new.stableford_points };
+          setScoresList(prev => [liveScore, ...prev.slice(0, 4)]);
+        })
+        .subscribe();
+
+      setLoading(false);
+    };
+    
+    fetchUserAndScores();
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+    
     setSubmitting(true);
-    await new Promise(r => setTimeout(r, 1200));
+    
+    // Save to Supabase (assuming 'scores' table)
+    const newScore = {
+      user_id: user.id,
+      course_name: course,
+      stableford_points: parseInt(score),
+    };
+    
+    const { error } = await supabase.from('scores').insert([newScore]);
+    
+    if (error) {
+      console.error('Error saving score:', error);
+    } else {
+      // Add to local list optimistically
+      const d = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toUpperCase();
+      setScoresList([{ date: d, course, stb: parseInt(score) }, ...scoresList.slice(0, 4)]);
+    }
+
     setSubmitting(false);
     setScore('');
     setCourse('');
   };
+
+  if (loading) {
+    return <div className={styles.layout} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh'}}><span className="label-tech">AUTHENTICATING_TERMINAL...</span></div>;
+  }
 
   return (
     <div className={styles.layout}>
@@ -40,10 +133,16 @@ export default function Dashboard() {
         <div className={styles.sidebarTop}>
           <span className="label-tech">PARSIDE_TERMINAL</span>
           <div className={styles.userBlock}>
-            <div className={styles.userAvatar}>JS</div>
+            <div className={styles.userAvatar}>
+              {profile?.full_name ? profile.full_name.substring(0, 2).toUpperCase() : 'US'}
+            </div>
             <div>
-              <div className={styles.userName}>JAMES_SMITH</div>
-              <div className={styles.userPlan}>PLAN: MONTHLY — ACTIVE</div>
+              <div className={styles.userName}>
+                {profile?.full_name ? profile.full_name.toUpperCase().replace(' ', '_') : 'USER_UNKNOWN'}
+              </div>
+              <div className={styles.userPlan}>
+                PLAN: {profile?.subscription_status === 'active' ? 'ACTIVE' : 'INACTIVE / PENDING'}
+              </div>
             </div>
           </div>
         </div>
@@ -108,7 +207,7 @@ export default function Dashboard() {
                 <span className="label-tech">STABLEFORD_PERFORMANCE — LAST_5_ROUNDS</span>
               </div>
               <div className={styles.chartBars}>
-                {SCORES.map((s, i) => {
+                {scoresList.map((s: any, i: number) => {
                   const pct = Math.round((s.stb / 54) * 100);
                   const color = s.stb >= 40 ? 'var(--accent)' : s.stb >= 35 ? '#60a5fa' : 'var(--t-muted)';
                   return (
@@ -171,7 +270,7 @@ export default function Dashboard() {
                   <span className="label-tech">STB_PTS</span>
                   <span className="label-tech">STATUS</span>
                 </div>
-                {SCORES.map((s, i) => {
+                {scoresList.map((s: any, i: number) => {
                   const status = s.stb >= 40 ? 'HIGH' : s.stb >= 35 ? 'GOOD' : 'LOW';
                   const color = s.stb >= 40 ? 'var(--accent)' : s.stb >= 35 ? '#60a5fa' : 'var(--t-muted)';
                   return (

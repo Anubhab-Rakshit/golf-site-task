@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabaseClient';
 import styles from './page.module.css';
 
-const CHARITIES = [
+const MOCK_CHARITIES = [
   { id: '01', name: 'Macmillan Cancer Support', tag: 'HEALTH', supporters: 820, raised: 28400 },
   { id: '02', name: 'Mental Health UK', tag: 'MENTAL_HEALTH', supporters: 440, raised: 15220 },
   { id: '03', name: 'Alzheimer\'s Society', tag: 'HEALTH', supporters: 310, raised: 11800 },
@@ -20,8 +21,31 @@ const TAGS = ['ALL', 'HEALTH', 'MENTAL_HEALTH', 'EMERGENCY', 'GLOBAL', 'ELDERLY'
 export default function Charities() {
   const [query, setQuery] = useState('');
   const [tag, setTag] = useState('ALL');
+  const [charitiesList, setCharitiesList] = useState<any[]>(MOCK_CHARITIES);
 
-  const filtered = CHARITIES.filter(c =>
+  useEffect(() => {
+    const fetchCharities = async () => {
+      try {
+        const { data, error } = await supabase.from('charities').select('*');
+        if (!error && data && data.length > 0) {
+          // Map DB to UI model roughly
+          const mapped = data.map((c, i) => ({
+            id: String(i + 1).padStart(2, '0'),
+            name: c.name,
+            tag: c.description?.toUpperCase() || 'GENERAL',
+            supporters: 0,
+            raised: 0
+          }));
+          setCharitiesList(mapped);
+        }
+      } catch (e) {
+        console.log("Using mock charities fallback.");
+      }
+    };
+    fetchCharities();
+  }, []);
+
+  const filtered = charitiesList.filter(c =>
     (tag === 'ALL' || c.tag === tag) &&
     c.name.toLowerCase().includes(query.toLowerCase())
   );
@@ -31,7 +55,7 @@ export default function Charities() {
       {/* Header */}
       <div className={styles.pageHead}>
         <div className={styles.headInner}>
-          <span className="label-tech">CHARITY_DIRECTORY — {CHARITIES.length} ENTITIES</span>
+          <span className="label-tech">CHARITY_DIRECTORY — {charitiesList.length} ENTITIES</span>
           <h1 className={styles.title}>Supported<br /><span className="text-accent">Entities</span></h1>
           <p className={styles.subtitle}>Every subscription allocates 30% to your chosen charity. The impact is compounded at scale across the subscriber base.</p>
         </div>

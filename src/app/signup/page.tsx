@@ -2,20 +2,62 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
 import styles from './page.module.css';
 
 export default function Signup() {
+  const router = useRouter();
   const [plan, setPlan] = useState<'monthly' | 'annual'>('monthly');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1500));
-    setLoading(false);
+    setError('');
+
+    try {
+      // 1. Create user in Supabase
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: name },
+        },
+      });
+
+      if (authError) throw authError;
+
+      const userId = authData.user?.id;
+      if (!userId) throw new Error("Account creation failed.");
+
+      // 2. Create Stripe Checkout Session
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ plan, userId }),
+      });
+
+      const session = await res.json();
+      
+      if (session.error) {
+        throw new Error(session.error);
+      }
+
+      // 3. Redirect to Stripe Checkout
+      window.location.href = session.url;
+      
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "An unexpected error occurred.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,6 +90,12 @@ export default function Signup() {
             <span className="label-tech">SUBSCRIPTION_TERMINAL</span>
             <h1 className={styles.formTitle}>Create Account</h1>
           </div>
+
+          {error && (
+            <div style={{ padding: '1rem', background: 'rgba(255, 77, 77, 0.06)', border: '1px solid rgba(255, 77, 77, 0.2)', borderLeft: '2px solid rgba(255, 77, 77, 0.6)' }}>
+              <span className="label-tech" style={{ color: '#ff4d4d' }}>{error}</span>
+            </div>
+          )}
 
           {/* Plan selector */}
           <div className={styles.planSelector}>
@@ -91,7 +139,7 @@ export default function Signup() {
               <input type="password" required placeholder="MIN_8_CHARS" value={password} onChange={e => setPassword(e.target.value)} className={styles.input} />
             </div>
             <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', justifyContent: 'center' }}>
-              {loading ? 'PROCESSING...' : `SUBSCRIBE — ${plan === 'monthly' ? '£9.99/MO' : '£99.99/YR'} →`}
+              {loading ? 'PROCESSING_PAYMENT...' : `SUBSCRIBE — ${plan === 'monthly' ? '£9.99/MO' : '£99.99/YR'} →`}
             </button>
           </form>
 
